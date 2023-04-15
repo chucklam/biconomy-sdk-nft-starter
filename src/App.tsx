@@ -20,6 +20,7 @@ export default function App() {
   const [profileImage, setProfileImage] = useState(
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmIbLlFK9l2nG67nwVI0-k4hOiHw9eIwso3dP3J71ojWVGAVOb43f33KXiTmIeb0oK1Ck&usqp=CAU'
   );
+  const [userName, setUserName] = useState('');
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
@@ -80,10 +81,13 @@ export default function App() {
       setLoading(false)
       
       const userInfo = await sdkRef.current?.getUserInfo();
+      console.log(userInfo);
       if (userInfo?.profileImage) {
         setProfileImage(userInfo.profileImage);
       }
-      console.log(userInfo);
+      if (userInfo?.name) {
+        setUserName(userInfo.name);
+      }
     } catch (err) {
       console.log('error setting up smart account... ', err)
     }
@@ -124,7 +128,7 @@ export default function App() {
                   </IconButton>
                 </Tooltip>
                 {
-                  anchorElUser &&
+                  !!anchorElUser &&
                   <Menu
                     sx={{ mt: '45px' }}
                     id="menu-appbar"
@@ -153,16 +157,20 @@ export default function App() {
           }
         </Toolbar>
       </AppBar>
-      <h1>Biconomy SDK Auth + Gasless NFT Example</h1>
       {
         loading && <p>Loading account details...</p>
       }
       {
-        !!smartAccount && (
+        !loading && (!!smartAccount
+        ?
           <>
-            <h3>Smart account address:</h3>
-            <p>{smartAccount.address}</p>
-            <Minter smartAccount={smartAccount} provider={provider} acct={acct} />
+          <h3>Hi {userName}. Your smart account address is {smartAccount.address}</h3>
+          <Minter smartAccount={smartAccount} provider={provider} acct={acct} />
+          </>
+        :
+          <>
+          <h1>Login to start minting NFTs</h1>
+          <Button onClick={login}>Login</Button>
           </>
         )
       }
