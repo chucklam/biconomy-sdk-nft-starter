@@ -6,6 +6,7 @@ import { ChainId } from "@biconomy/core-types";
 import { ethers } from 'ethers'
 import SmartAccount from "@biconomy/smart-account";
 import Minter from './components/Minter';
+import { Box, AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
 
 
 export default function App() {
@@ -91,25 +92,33 @@ export default function App() {
   console.log({ acct , provider})
 
   return (
-    <div>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} textAlign='left'>
+            Gasless NFT
+          </Typography>
+          {
+            !!smartAccount
+            ? <Button color="inherit" onClick={logout}>Logout</Button>
+            : !loading && <Button color="inherit" onClick={login}>Login</Button>
+          }
+        </Toolbar>
+      </AppBar>
       <h1>Biconomy SDK Auth + Gasless NFT Example</h1>
-      {
-        !smartAccount && !loading && <button onClick={login}>Login</button>
-      }
       {
         loading && <p>Loading account details...</p>
       }
       {
         !!smartAccount && (
-          <div className="buttonWrapper">
+          <>
             <h3>Smart account address:</h3>
             <p>{smartAccount.address}</p>
             <Minter smartAccount={smartAccount} provider={provider} acct={acct} />
-            <button onClick={logout}>Logout</button>
-          </div>
+          </>
         )
       }
-    </div>
+    </Box>
   )
 }
 
