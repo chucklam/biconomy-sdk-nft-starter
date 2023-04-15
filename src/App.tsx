@@ -109,12 +109,6 @@ export default function App() {
           </div>
         )
       }
-      <p>
-      Edit <code>src/App.tsx</code> and save to test
-      </p>
-      <a href="https://docs.biconomy.io/introduction/overview" target="_blank" className="read-the-docs">
-  Click here to check out the docs
-    </a>
     </div>
   )
 }
