@@ -6,8 +6,9 @@ import { ChainId } from "@biconomy/core-types";
 import { ethers } from 'ethers'
 import SmartAccount from "@biconomy/smart-account";
 import Minter from './components/Minter';
-import { Box, AppBar, Toolbar, IconButton, Typography, Button } from '@mui/material';
+import { Box, AppBar, Toolbar, IconButton, Typography, Button, Avatar, Menu, MenuItem, Tooltip } from '@mui/material';
 
+const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 export default function App() {
   const [smartAccount, setSmartAccount] = useState<SmartAccount | null>(null)
@@ -16,6 +17,10 @@ export default function App() {
   const [loading, setLoading] = useState<boolean>(false)
   const [provider, setProvider] = useState<any>(null);
   const [acct, setAcct] = useState<any>(null);
+  const [profileImage, setProfileImage] = useState(
+    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRmIbLlFK9l2nG67nwVI0-k4hOiHw9eIwso3dP3J71ojWVGAVOb43f33KXiTmIeb0oK1Ck&usqp=CAU'
+  );
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
 
   useEffect(() => {
     let configureLogin:any
@@ -73,6 +78,12 @@ export default function App() {
       setAcct(acct)
       setSmartAccount(smartAccount)
       setLoading(false)
+      
+      const userInfo = await sdkRef.current?.getUserInfo();
+      if (userInfo?.profileImage) {
+        setProfileImage(userInfo.profileImage);
+      }
+      console.log(userInfo);
     } catch (err) {
       console.log('error setting up smart account... ', err)
     }
@@ -91,16 +102,53 @@ export default function App() {
 
   console.log({ acct , provider})
 
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+  const handleCloseUserMenu = () => setAnchorElUser(null);
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} textAlign='left'>
-            Gasless NFT
+            Social Login & Gasless NFT Minting
           </Typography>
           {
             !!smartAccount
-            ? <Button color="inherit" onClick={logout}>Logout</Button>
+            ?
+              <Box sx={{ flexGrow: 0 }}>
+                <Tooltip title="Open settings">
+                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                    <Avatar alt="Remy Sharp" src={profileImage} />
+                  </IconButton>
+                </Tooltip>
+                {
+                  anchorElUser &&
+                  <Menu
+                    sx={{ mt: '45px' }}
+                    id="menu-appbar"
+                    anchorEl={anchorElUser}
+                    anchorOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    keepMounted
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                    open={Boolean(anchorElUser)}
+                    onClose={handleCloseUserMenu}
+                  >
+                    {settings.map((setting) => (
+                      <MenuItem key={setting} onClick={logout}>
+                        <Typography textAlign="center">{setting}</Typography>
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                }
+              </Box>
             : !loading && <Button color="inherit" onClick={login}>Login</Button>
           }
         </Toolbar>
