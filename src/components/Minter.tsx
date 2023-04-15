@@ -3,6 +3,21 @@ import { ethers } from "ethers";
 import abi from "../utils/abi.json";
 import SmartAccount from "@biconomy/smart-account";
 
+import { Network, Alchemy } from 'alchemy-sdk';
+
+const settings = {
+    apiKey: "5japsVsp7IA6yhDg0VoXzKH4XAkM6rhw",
+    network: Network.MATIC_MUMBAI,
+};
+const alchemy = new Alchemy(settings);
+
+// Listen to all new pending transactions
+// alchemy.ws.on(
+//     { method: "alchemy_pendingTransactions",
+//     fromAddress: "0xshah.eth" },
+//     (res) => console.log(res)
+// );
+
 interface Props {
     smartAccount: SmartAccount
     provider: any
@@ -10,23 +25,19 @@ interface Props {
   }
 
 const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
-    const [nftContract, setNFTContract] = useState<any>(null)
     const [nftCount, setNFTCount] = useState<number>(0);
     const nftAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
+
+    const nftContract = new ethers.Contract(nftAddress, abi, provider);
 
     useEffect(() => {
         getNFTCount()
     },[])
 
-    const getNFTCount= async() => {
-        const contract = new ethers.Contract(
-            nftAddress,
-            abi,
-            provider,
-          )
-        setNFTContract(contract)
-        const count = await contract.balanceOf(smartAccount.address)
-        setNFTCount(count.toNumber());
+    const getNFTCount = async () => {
+        const nfts = await alchemy.nft.getNftsForOwner(smartAccount.address);
+        console.log(nfts);
+        setNFTCount(nfts.totalCount);
     }
 
     const mintNFT = async () => {

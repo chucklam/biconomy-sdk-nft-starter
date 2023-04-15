@@ -128,7 +128,7 @@ export default function App() {
                   </IconButton>
                 </Tooltip>
                 {
-                  !!anchorElUser &&
+                  Boolean(anchorElUser) &&
                   <Menu
                     sx={{ mt: '45px' }}
                     id="menu-appbar"
