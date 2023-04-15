@@ -116,44 +116,48 @@ export default function App() {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }} textAlign='left'>
-            Social Login & Gasless NFT Minting
+            Easy NFT Ticketing
           </Typography>
           {
-            !!smartAccount
-            ?
-              <Box sx={{ flexGrow: 0 }}>
-                <Tooltip title="Open settings">
-                  <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                    <Avatar alt="Remy Sharp" src={profileImage} />
-                  </IconButton>
-                </Tooltip>
-                {
-                  Boolean(anchorElUser) &&
-                  <Menu
-                    sx={{ mt: '45px' }}
-                    id="menu-appbar"
-                    anchorEl={anchorElUser}
-                    anchorOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    keepMounted
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                    open={Boolean(anchorElUser)}
-                    onClose={handleCloseUserMenu}
-                  >
-                    {settings.map((setting) => (
-                      <MenuItem key={setting} onClick={logout}>
-                        <Typography textAlign="center">{setting}</Typography>
-                      </MenuItem>
-                    ))}
-                  </Menu>
-                }
-              </Box>
-            : !loading && <Button color="inherit" onClick={login}>Login</Button>
+            !!smartAccount &&
+            <Box sx={{ flexGrow: 0 }}>
+              <Tooltip title="Open settings">
+                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                  <Avatar alt="Remy Sharp" src={profileImage} />
+                </IconButton>
+              </Tooltip>
+              {
+                !!anchorElUser &&
+                <Menu
+                  sx={{ mt: '45px' }}
+                  id="menu-appbar"
+                  anchorEl={anchorElUser}
+                  anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  keepMounted
+                  transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                  }}
+                  open={Boolean(anchorElUser)}
+                  onClose={handleCloseUserMenu}
+                >
+                  <MenuItem>
+                    <Typography textAlign="right">
+                        {userName}: {smartAccount.address}
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem onClick={() => window.open(`https://testnets.opensea.io/${smartAccount.address}`)}>
+                    <Button>OpenSea</Button>
+                  </MenuItem>
+                  <MenuItem onClick={logout}>
+                    <Button>Logout</Button>
+                  </MenuItem>
+                </Menu>
+              }
+            </Box>
           }
         </Toolbar>
       </AppBar>
@@ -163,13 +167,10 @@ export default function App() {
       {
         !loading && (!!smartAccount
         ?
-          <>
-          <h3>Hi {userName}. Your smart account address is {smartAccount.address}</h3>
           <Minter smartAccount={smartAccount} provider={provider} acct={acct} />
-          </>
         :
           <>
-          <h1>Login to start minting NFTs</h1>
+          <h1>Just Log In and Start Minting</h1>
           <Button onClick={login}>Login</Button>
           </>
         )

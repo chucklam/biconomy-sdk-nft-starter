@@ -4,7 +4,7 @@ import abi from "../utils/abi.json";
 import SmartAccount from "@biconomy/smart-account";
 
 import { Network, Alchemy, OwnedNftsResponse } from 'alchemy-sdk';
-import { ImageList, ImageListItem, ListSubheader, ImageListItemBar, IconButton } from "@mui/material";
+import { ImageList, ImageListItem, ListSubheader, ImageListItemBar, IconButton, Button } from "@mui/material";
 
 const settings = {
     apiKey: "5japsVsp7IA6yhDg0VoXzKH4XAkM6rhw",
@@ -36,11 +36,7 @@ const NFTImageList:React.FC<{
       <ImageList>
         {itemData.map((item) => (
           <ImageListItem key={item.img}>
-            <img
-              src={item.img}
-              alt={item.title}
-              loading="lazy"
-            />
+            <img src={item.img} alt={item.title} loading="lazy" />
             <ImageListItemBar
               title={item.title}
               subtitle={item.description}
@@ -107,19 +103,15 @@ const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
         }
     }
 
-    const nftURL = `https://testnets.opensea.io/${smartAccount.address}`
-
     return(
         <>
-            <button onClick={() => mintNFT()}>Mint One</button>
-            <button onClick={() => mintMultipleNFT()}>Mint Two</button>
-            {nfts ? (<p>You own {nfts.totalCount} tickets </p>): null}
-            {nfts ? (<p>View your NFTs <a href={nftURL} target="_blank">here</a> </p>): null}
             {nfts && <NFTImageList itemData={nfts.ownedNfts.map(nft => ({
                 img: nft.rawMetadata?.image || '',
                 title: nft.title,
                 description: nft.description,
             }))}/>}
+            <Button onClick={() => mintNFT()}>Mint Another</Button>
+            {/* <Button onClick={() => mintMultipleNFT()}>Mint Two</Button> */}
         </>
     )
 };
