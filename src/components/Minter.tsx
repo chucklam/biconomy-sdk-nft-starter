@@ -3,7 +3,8 @@ import { ethers } from "ethers";
 import abi from "../utils/abi.json";
 import SmartAccount from "@biconomy/smart-account";
 
-import { Network, Alchemy } from 'alchemy-sdk';
+import { Network, Alchemy, OwnedNftsResponse } from 'alchemy-sdk';
+import { ImageList, ImageListItem, ListSubheader, ImageListItemBar, IconButton } from "@mui/material";
 
 const settings = {
     apiKey: "5japsVsp7IA6yhDg0VoXzKH4XAkM6rhw",
@@ -22,22 +23,48 @@ interface Props {
     smartAccount: SmartAccount
     provider: any
     acct: any
-  }
+}
+
+const NFTImageList:React.FC<{
+    itemData: {
+        img: string,
+        title: string,
+        description: string,
+    }[]
+}> = ({ itemData }) => {
+    return (
+      <ImageList>
+        {itemData.map((item) => (
+          <ImageListItem key={item.img}>
+            <img
+              src={item.img}
+              alt={item.title}
+              loading="lazy"
+            />
+            <ImageListItemBar
+              title={item.title}
+              subtitle={item.description}
+            />
+          </ImageListItem>
+        ))}
+      </ImageList>
+    );
+}
 
 const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
-    const [nftCount, setNFTCount] = useState<number>(0);
-    const nftAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
+    const [nfts, setNFTs] = useState<OwnedNftsResponse>();
 
+    const nftAddress = import.meta.env.VITE_NFT_CONTRACT_ADDRESS;
     const nftContract = new ethers.Contract(nftAddress, abi, provider);
 
     useEffect(() => {
-        getNFTCount()
+        getNFTs()
     },[])
 
-    const getNFTCount = async () => {
+    const getNFTs = async () => {
         const nfts = await alchemy.nft.getNftsForOwner(smartAccount.address);
         console.log(nfts);
-        setNFTCount(nfts.totalCount);
+        setNFTs(nfts);
     }
 
     const mintNFT = async () => {
@@ -52,7 +79,7 @@ const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
             const txHash = await txResponse.wait();
             console.log({txHash})
             console.log({txResponse})
-            getNFTCount()
+            getNFTs()
         } catch (error) {
             console.log(error)
         }
@@ -74,7 +101,7 @@ const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
             const txHash = await txResponse.wait();
             console.log({txHash})
             console.log({txResponse})
-            getNFTCount()
+            getNFTs()
         } catch (error) {
             console.log(error)
         }
@@ -83,12 +110,17 @@ const Minter:React.FC<Props> = ({ smartAccount, provider, acct}) => {
     const nftURL = `https://testnets.opensea.io/${smartAccount.address}`
 
     return(
-        <div>
+        <>
             <button onClick={() => mintNFT()}>Mint One</button>
             <button onClick={() => mintMultipleNFT()}>Mint Two</button>
-            {nftCount ? (<p>You own {nftCount} tickets </p>): null}
-            {nftCount ? (<p>View your NFTs <a href={nftURL} target="_blank">here</a> </p>): null}
-        </div>
+            {nfts ? (<p>You own {nfts.totalCount} tickets </p>): null}
+            {nfts ? (<p>View your NFTs <a href={nftURL} target="_blank">here</a> </p>): null}
+            {nfts && <NFTImageList itemData={nfts.ownedNfts.map(nft => ({
+                img: nft.rawMetadata?.image || '',
+                title: nft.title,
+                description: nft.description,
+            }))}/>}
+        </>
     )
 };
 
